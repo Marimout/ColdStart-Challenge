@@ -10,8 +10,7 @@ export default {
     return {
     };
   },
-  methods: {
-  },
+  methods: {},
 };
 </script>
 
@@ -22,6 +21,18 @@ export default {
       <div class="navbar-menu">
         <div class="navbar-start">
           <router-link class="navbar-item nav-home" to="/">Home</router-link>
+          <a
+            v-if="this.$root.$data.user"
+            class="navbar-item nav-home"
+            href="/.auth/logout"
+            >Hello {{ this.$root.$data.user.userDetails }} (Logout)</a
+          >
+          <a
+            v-else
+            class="navbar-item nav-home"
+            href="/.auth/login/facebook"
+            >Login</a
+          >
         </div>
       </div>
     </nav>

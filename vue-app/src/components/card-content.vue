@@ -35,6 +35,7 @@ export default {
         <img v-bind:src="imageurl" />
       </div>
       <p class="description">{{ description }}</p>
+      <div><button v-if="this.$root.$data.user" class="button">Add to cart</button></div>
     </div>
   </div>
 </template>

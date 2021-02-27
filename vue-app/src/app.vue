@@ -4,7 +4,8 @@ import HeaderBar from '@/components/header-bar.vue';
 export default {
   name: 'App',
   data() {
-    return {};
+    return {
+    };
   },
   components: {
     HeaderBar,

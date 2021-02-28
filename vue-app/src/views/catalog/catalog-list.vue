@@ -42,6 +42,7 @@ export default {
             :name="icecream.Name"
             :description="icecream.Description"
             :imageurl="icecream.ImageUrl"
+            :id="icecream.Id"
           />
         </div>
       </div>

@@ -11,9 +11,11 @@ new Vue({
   store,
   data: {
     user: undefined,
+    cart: undefined,
   },
   async created() {
     this.user = await getUserInfo();
+    this.cart = {};
   },
   render: (h) => h(App),
 }).$mount('#app');

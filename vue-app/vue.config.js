@@ -9,6 +9,10 @@ module.exports = {
         ws: true,
         changeOrigin: true,
       },
+      '/.auth': {
+        target: 'http://localhost:7071/api/user',
+        pathRewrite: {'^/.auth.*' : ''},
+      },
     },
   },
 };

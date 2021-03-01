@@ -60,6 +60,9 @@ export default {
         this.$root.$data.cart = {};
       }
     },
+    async emptyCart() {
+      this.$root.$data.cart = {};
+    },
   },
 };
 </script>
@@ -83,7 +86,7 @@ export default {
               Submit order
             </button>
           </p>
-          <p class="control"><button class="button">Empty cart</button></p>
+          <p class="control"><button v-on:click="emptyCart" class="button">Empty cart</button></p>
         </div>
       </div>
     </div>

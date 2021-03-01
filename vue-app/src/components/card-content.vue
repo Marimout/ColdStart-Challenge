@@ -3,7 +3,7 @@ export default {
   name: 'CardContent',
   props: {
     id: {
-      type: String,
+      type: Number,
       default: () => '',
     },
     name: {

@@ -2,6 +2,7 @@
 import { mapActions, mapGetters } from 'vuex';
 import ListHeader from '@/components/list-header.vue';
 import CatalogList from './catalog-list.vue';
+import getPersonalizer from '../../assets/js/personalizer';
 
 export default {
   name: 'Catalog',
@@ -11,6 +12,8 @@ export default {
       message: '',
       routePath: '/catalog',
       title: 'Our Ice Creams',
+      recommendedId: 0,
+      eventId: '',
     };
   },
   components: {
@@ -19,6 +22,9 @@ export default {
   },
   async created() {
     await this.getCatalog();
+    const personalizer = await getPersonalizer();
+    this.recommendedId = parseInt(personalizer.ranking[0].id, 10);
+    this.eventId = personalizer.eventId;
   },
   computed: {
     ...mapGetters('catalog', { catalog: 'catalog' }),
@@ -46,6 +52,8 @@ export default {
         <CatalogList
           :icecreams="catalog"
           :errorMessage="errorMessage"
+          :recommendedId=recommendedId
+          :eventId="eventId"
         ></CatalogList>
       </div>
     </div>

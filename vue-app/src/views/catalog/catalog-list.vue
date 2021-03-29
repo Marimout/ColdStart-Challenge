@@ -12,6 +12,14 @@ export default {
       type: String,
       default: () => '',
     },
+    eventId: {
+      type: String,
+      default: () => '',
+    },
+    recommendedId: {
+      type: Number,
+      default: () => 0,
+    },
   },
   components: {
     CardContent,
@@ -43,6 +51,8 @@ export default {
             :description="icecream.Description"
             :imageurl="icecream.ImageUrl"
             :id="icecream.Id"
+            :recommendedId="recommendedId"
+            :eventId="eventId"
           />
         </div>
       </div>

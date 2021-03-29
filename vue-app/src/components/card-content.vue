@@ -1,4 +1,6 @@
 <script>
+import { postReward } from '../assets/js/personalizer';
+
 export default {
   name: 'CardContent',
   props: {
@@ -18,14 +20,27 @@ export default {
       type: String,
       default: () => '',
     },
+    eventId: {
+      type: String,
+      default: () => '',
+    },
+    recommendedId: {
+      type: Number,
+      default: () => undefined,
+    },
   },
   methods: {
     addToCart() {
       const { cart } = this.$root.$data;
+
       if (this.id in cart) {
         cart[this.id] += 1;
       } else {
         cart[this.id] = 1;
+      }
+
+      if (this.id === this.recommendedId) {
+        postReward(this.eventId, 1);
       }
     },
   },
@@ -43,6 +58,7 @@ export default {
         <img v-bind:src="imageurl" />
       </div>
       <p class="description">{{ description }}</p>
+      <div v-if="this.recommendedId == this.id">! RECOMMENDED !</div>
       <div>
         <button
           v-if="this.$root.$data.user"

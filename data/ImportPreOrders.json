@@ -1,0 +1,262 @@
+{
+    "$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+    "contentVersion": "1.0.0.0",
+    "parameters": {
+        "factoryName": {
+            "type": "string",
+            "metadata": "Data Factory name"
+        },
+        "PreOrders": {
+            "type": "string"
+        },
+        "ColdStart": {
+            "type": "string"
+        }
+    },
+    "variables": {
+        "factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+    },
+    "resources": [
+        {
+            "name": "[concat(parameters('factoryName'), '/ImportPreOrders')]",
+            "type": "Microsoft.DataFactory/factories/pipelines",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "description": "Import ColdStart pre-orders into SQL database",
+                "activities": [
+                    {
+                        "name": "Copy_vpx",
+                        "type": "Copy",
+                        "dependsOn": [],
+                        "policy": {
+                            "timeout": "7.00:00:00",
+                            "retry": 0,
+                            "retryIntervalInSeconds": 30,
+                            "secureOutput": false,
+                            "secureInput": false
+                        },
+                        "userProperties": [
+                            {
+                                "name": "Source",
+                                "value": "preorders//coldstart-orders-historical.csv"
+                            },
+                            {
+                                "name": "Destination",
+                                "value": "dbo.Orders"
+                            }
+                        ],
+                        "typeProperties": {
+                            "source": {
+                                "type": "DelimitedTextSource",
+                                "storeSettings": {
+                                    "type": "AzureBlobStorageReadSettings",
+                                    "recursive": false,
+                                    "enablePartitionDiscovery": false
+                                },
+                                "formatSettings": {
+                                    "type": "DelimitedTextReadSettings",
+                                    "skipLineCount": 0
+                                }
+                            },
+                            "sink": {
+                                "type": "SqlServerSink"
+                            },
+                            "enableStaging": false,
+                            "validateDataConsistency": false,
+                            "translator": {
+                                "type": "TabularTranslator",
+                                "mappings": [
+                                    {
+                                        "source": {
+                                            "name": "Id",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Id",
+                                            "type": "Guid",
+                                            "physicalType": "uniqueidentifier"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "User",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "User",
+                                            "type": "String",
+                                            "physicalType": "nvarchar"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "Date",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "Date",
+                                            "type": "DateTime",
+                                            "physicalType": "datetime"
+                                        }
+                                    },
+                                    {
+                                        "source": {
+                                            "name": "IcecreamId",
+                                            "type": "String",
+                                            "physicalType": "String"
+                                        },
+                                        "sink": {
+                                            "name": "IcecreamId",
+                                            "type": "Int32",
+                                            "physicalType": "int"
+                                        }
+                                    }
+                                ],
+                                "typeConversion": true,
+                                "typeConversionSettings": {
+                                    "allowDataTruncation": true,
+                                    "treatBooleanAsNumber": false
+                                }
+                            }
+                        },
+                        "inputs": [
+                            {
+                                "referenceName": "SourceDataset_vpx",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ],
+                        "outputs": [
+                            {
+                                "referenceName": "DestinationDataset_vpx",
+                                "type": "DatasetReference",
+                                "parameters": {}
+                            }
+                        ]
+                    }
+                ],
+                "annotations": [],
+                "lastPublishTime": "2021-03-20T20:10:54Z"
+            },
+            "dependsOn": [
+                "[concat(variables('factoryId'), '/datasets/SourceDataset_vpx')]",
+                "[concat(variables('factoryId'), '/datasets/DestinationDataset_vpx')]"
+            ]
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/SourceDataset_vpx')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "[parameters('PreOrders')]",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "DelimitedText",
+                "typeProperties": {
+                    "location": {
+                        "type": "AzureBlobStorageLocation",
+                        "fileName": "coldstart-orders-historical.csv",
+                        "container": "preorders"
+                    },
+                    "columnDelimiter": ",",
+                    "rowDelimiter": "\n",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": true,
+                    "quoteChar": "\""
+                },
+                "schema": [
+                    {
+                        "name": "User",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Date",
+                        "type": "String"
+                    },
+                    {
+                        "name": "Id",
+                        "type": "String"
+                    },
+                    {
+                        "name": "IcecreamId",
+                        "type": "String"
+                    }
+                ]
+            },
+            "dependsOn": []
+        },
+        {
+            "name": "[concat(parameters('factoryName'), '/DestinationDataset_vpx')]",
+            "type": "Microsoft.DataFactory/factories/datasets",
+            "apiVersion": "2018-06-01",
+            "properties": {
+                "linkedServiceName": {
+                    "referenceName": "[parameters('ColdStart')]",
+                    "type": "LinkedServiceReference"
+                },
+                "annotations": [],
+                "type": "SqlServerTable",
+                "schema": [
+                    {
+                        "name": "Id",
+                        "type": "uniqueidentifier",
+                        "precision": 0,
+                        "scale": 0
+                    },
+                    {
+                        "name": "User",
+                        "type": "nvarchar",
+                        "precision": 0,
+                        "scale": 0
+                    },
+                    {
+                        "name": "Date",
+                        "type": "datetime",
+                        "precision": 23,
+                        "scale": 3
+                    },
+                    {
+                        "name": "IcecreamId",
+                        "type": "int",
+                        "precision": 10,
+                        "scale": 0
+                    },
+                    {
+                        "name": "Status",
+                        "type": "nvarchar",
+                        "precision": 0,
+                        "scale": 0
+                    },
+                    {
+                        "name": "DriverId",
+                        "type": "int",
+                        "precision": 10,
+                        "scale": 0
+                    },
+                    {
+                        "name": "FullAddress",
+                        "type": "nvarchar",
+                        "precision": 0,
+                        "scale": 0
+                    },
+                    {
+                        "name": "LastPosition",
+                        "type": "nvarchar",
+                        "precision": 0,
+                        "scale": 0
+                    }
+                ],
+                "typeProperties": {
+                    "schema": "dbo",
+                    "table": "Orders"
+                }
+            },
+            "dependsOn": []
+        }
+    ]
+}
